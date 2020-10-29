@@ -16,5 +16,17 @@ mcp = MCP.MCP3008(spi, cs)
 # create an analog input channel on pin 0
 chan = AnalogIn(mcp, MCP.P0)
 
-print(’Raw ADC Value: ’, chan.value)
-print(’ADC Voltage: ’ + str(chan.voltage) + ’V’)
+# Function to print sensor value every 10 seconds
+def print_adc_thread():
+    thread = threading.Timer(10.0, print_adc_thread) # execute every 10 s
+    thread.daemon = True # Exit thread when program does
+    thread.start()
+
+    print(’Raw ADC Value: ’, chan.value)
+    print(’ADC Voltage: ’ + str(chan.voltage) + ’V’)
+
+if __name__ == "__main__":
+    print_adc_thread() # start print thread
+
+    while True:
+        pass # run indefinitely
