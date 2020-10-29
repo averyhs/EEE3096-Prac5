@@ -1,15 +1,16 @@
+import threading
 import busio
 import digitalio
 import board
 import adafruit_mcp3xxx.mcp3008 as MCP
 from adafruit_mcp3xxx.analog_in import AnalogIn
+from time import time
 
 # create the spi bus
 spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
 
 # create the cs (chip select)
 cs = digitalio.DigitalInOut(board.D5)
-
 # create the mcp object
 mcp = MCP.MCP3008(spi, cs)
 
@@ -22,11 +23,23 @@ def print_adc_thread():
     thread.daemon = True # Exit thread when program does
     thread.start()
 
-    print(’Raw ADC Value: ’, chan.value)
-    print(’ADC Voltage: ’ + str(chan.voltage) + ’V’)
+    runtime = time() - starttime # calculate runtime
+    runtime = int(runtime)
+    
+    # Calculate temp
+    # From datasheet: Vout = Tc * Ta + V0
+    # => Ta = (Vout - V0) / Tc
+    Tc = 10.0 # temp coeff from datasheet
+    V0 = 0.5 # [V] Vout at T=0C from datasheet
+    temp = (chan.voltage - V0)/Tc
+
+    # print adc value
+    print(runtime,"s\t",chan.value,"\t\t",temp," C",sep="")
 
 if __name__ == "__main__":
+    starttime = time() # get start time
+    print("Runtime\tTemp Reading\tTemp")
     print_adc_thread() # start print thread
 
-    while True:
-        pass # run indefinitely
+    while int(time() - starttime) < 65:
+        pass # run for 1 min
