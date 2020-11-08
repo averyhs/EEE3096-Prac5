@@ -58,7 +58,7 @@ if __name__ == "__main__":
     spi_setup()
     gpio_setup()
     
-    print("Runtime\tADC Reading\tLDR Voltage")
+    print("Runtime\tADC Reading\tTemperature")
     starttime = time() # get start time
     print_adc()
 
